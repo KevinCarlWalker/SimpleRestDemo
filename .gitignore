@@ -1,0 +1,9 @@
+.gradle/
+.idea
+build/
+out/
+*.iml
+commit
+releaseVersion.properties
+.npmrc
+/dependencies.txt

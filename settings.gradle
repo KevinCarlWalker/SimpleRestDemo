@@ -1,0 +1,10 @@
+pluginManagement {
+  repositories {
+    maven {
+      url 'http://ut-maven:8081/artifactory/plugins-release'
+    }
+    gradlePluginPortal()
+  }
+}
+
+rootProject.name = 'simple-rest-demo'

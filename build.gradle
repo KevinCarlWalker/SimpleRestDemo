@@ -1,0 +1,54 @@
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.8.RELEASE")
+  }
+}
+
+plugins {
+  id 'gidout.idp-plugin' version '1.5.9'
+}
+
+apply plugin: 'org.springframework.boot'
+
+// expose build information via the spring actuator /info endpoint
+springBoot {
+  buildInfo()
+}
+
+dependencies {
+
+  //spring
+  compile 'org.springframework.boot:spring-boot-starter-jetty'
+  compile 'org.springframework.boot:spring-boot-starter-web'
+  compile 'org.springframework.boot:spring-boot-starter-actuator'
+
+  //logging
+  runtime 'org.apache.logging.log4j:log4j-core'
+  runtime 'org.apache.logging.log4j:log4j-1.2-api'
+  compile 'commons-logging:commons-logging'
+
+  // swagger
+  compile 'io.springfox:springfox-swagger2:2.9.2'
+  compile 'io.springfox:springfox-swagger-ui:2.9.2'
+
+  //testing
+  testCompile('org.spockframework:spock-spring:1.1-groovy-2.4') {
+    exclude module: 'groovy-all'
+  }
+  testCompile('org.spockframework:spock-core:1.1-groovy-2.4') {
+    exclude module: 'groovy-all'
+  }
+
+  testCompile 'org.springframework.boot:spring-boot-test'
+  testCompile 'org.springframework.boot:spring-boot-starter-test'
+
+  configurations.all {
+    exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+    exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    exclude group: 'org.springframework.boot', module: 'logback-classic'
+    exclude group: 'log4j', module: 'log4j'
+  }
+}

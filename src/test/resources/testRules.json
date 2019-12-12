@@ -1,0 +1,17 @@
+{
+  "accountsList": [
+    {
+      "accountId": 10,
+      "accountName": "accountString",
+      "rulesList": [
+        {
+          "priority": 1,
+          "timeout": 22,
+          "userId": 45
+        }
+      ]
+    }
+  ],
+  "companyId": 123,
+  "companyName": "Company Name"
+}
