@@ -1,4 +1,4 @@
-FROM docker.artifactory.neovest.com/idp-base
+FROM ubuntu.18.04
 
 COPY simple-rest-demo.jar simple-rest-demo.jar
 
