@@ -12,9 +12,11 @@ When running locally, an example of actuator endpoint: http://localhost:8089/met
 [Actuator endpoint documentation](https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-features.html "Production Ready Features")
 
 # H2 Database
-This application uses a embedded, in memmory database created by H2. 
+This application uses a embedded, in memory database created by H2. 
 
 [H2 Database Engine](https://www.h2database.com/html/main.html "H2 landing page")
 
 # To run locally
+Requires Java 8
+
 Run Main() found in Application.java
