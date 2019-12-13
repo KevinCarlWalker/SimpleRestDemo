@@ -6,8 +6,6 @@ import com.kevinCarlWalker.web.exceptions.BadRequestException
 import com.kevinCarlWalker.web.exceptions.NotFoundException
 import spock.lang.Specification
 
-import javax.naming.event.NamespaceChangeListener
-
 class NamesApiTest extends Specification {
 
   NamesApi api = new NamesApi()

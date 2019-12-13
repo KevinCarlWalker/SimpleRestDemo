@@ -48,6 +48,8 @@ public class DatabaseHelpers {
         name.setFirstName(rs.getString("firstName"));
         name.setLastName(rs.getString("lastName"));
       }
+      select.close();
+      con.close();
     } catch (Exception e) {
       System.out.println(e.getMessage());
     }
@@ -67,10 +69,12 @@ public class DatabaseHelpers {
 
       insert.executeUpdate();
       ResultSet rs = insert.getGeneratedKeys();
-      boolean success = insert.execute();
+      insert.execute();
       while (rs.next()) {
         newNameId = rs.getInt(1);
       }
+      insert.close();
+      con.close();
     } catch (Exception e) {
       System.out.println(e.getMessage());
     }
@@ -89,6 +93,8 @@ public class DatabaseHelpers {
       insert.setInt(3, name.getNameId());
 
       insert.executeUpdate();
+      insert.close();
+      con.close();
     } catch (Exception e) {
       System.out.println(e.getMessage());
     }
@@ -100,10 +106,12 @@ public class DatabaseHelpers {
       Class.forName("org.h2.Driver");
       Connection con = DriverManager.getConnection("jdbc:h2:~/test", "simpleRestDemo", "");
 
-      PreparedStatement insert = con.prepareStatement(DELETE_NAME);
-      insert.setInt(1, nameId);
-      insert.execute();
+      PreparedStatement delete = con.prepareStatement(DELETE_NAME);
+      delete.setInt(1, nameId);
+      delete.execute();
 
+      delete.close();
+      con.close();
     } catch (Exception e) {
       System.out.println(e.getMessage());
     }
