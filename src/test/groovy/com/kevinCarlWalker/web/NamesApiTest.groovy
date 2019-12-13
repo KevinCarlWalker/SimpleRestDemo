@@ -4,26 +4,31 @@ import com.kevinCarlWalker.web.Model.Names
 import com.kevinCarlWalker.web.Model.NamesValidator
 import com.kevinCarlWalker.web.exceptions.BadRequestException
 import com.kevinCarlWalker.web.exceptions.NotFoundException
-
 import spock.lang.Specification
+
+import javax.naming.event.NamespaceChangeListener
 
 class NamesApiTest extends Specification {
 
   NamesApi api = new NamesApi()
-  Names validName1
+  Names validName
+  Names emptyName
+  Names newName
 
   void setup() {
-    validName1 = new Names(34, "Donkey","Kong")
+    validName = new Names(34, "Donkey","Kong")
+    emptyName = new Names()
+    newName = new Names(0, "Diddy", "Kong")
   }
 
-  def "Get should return a Names Object"() {
-
+  def "Post to create an object, the Get it and make sure it matches"() {
     when:
-    def getMessage = api.getName(validName1.getNameId())
+    def postMessage = api.postName(newName)
+    def getMessage = api.getName(postMessage.getNameId())
     then:
     noExceptionThrown()
-    getMessage == validName1
-    getMessage.getNameId() == validName1.getNameId()
+    getMessage.getFirstName() == postMessage.getFirstName()
+    getMessage.getLastName() == postMessage.getLastName()
   }
 
   def "Get should throw an exception if nameId is negative"() {
@@ -35,33 +40,46 @@ class NamesApiTest extends Specification {
     exception.message == NamesValidator.ERROR_INVALID_NAME_ID + negNumber
   }
 
-  def "Get should throw an exception if companyId is not found"() {
+  def "Post should insert into Database when object doesn't have an ID"() {
     when:
-    api.getName(validName1.getNameId())
-    then:
-    def exception = thrown(NotFoundException)
-    exception.message == NamesValidator.ERROR_INVALID_NAME_ID + validName1.getNameId()
-  }
-
-  def "Post should insert into Database when all goes well"() {
-    when:
-    api.postName(validName1)
+    def postName = api.postName(newName)
     then:
     noExceptionThrown()
+    postName.getFirstName() == newName.getFirstName()
+    postName.getLastName() == newName.getLastName()
+    postName.getNameId() > 0
   }
 
-  def "Put should update Database when all goes well"() {
+  def "Post a Name, and update with Put. UpdateName should be called once, updates should be saved"() {
     when:
-    api.putName(validName1.getNameId(), validName1)
+    def postName = api.postName(newName)
+    def updatedName = new Names(postName.getNameId(), "King", "Kong")
+    def putName = api.putName(postName.getNameId(), updatedName)
     then:
     noExceptionThrown()
+    putName.getFirstName() == updatedName.getFirstName()
+    putName.getLastName() == updatedName.getLastName()
+    putName.getNameId() == postName.getNameId()
   }
 
   def "Put should throw error if nameId on path and in object don't match" (){
     when:
-    api.putName(56, validName1)
+    api.putName(1, validName)
     then:
     def exception = thrown(BadRequestException)
     exception.message == NamesValidator.ERROR_MISS_MATCHED_NAME_ID
+  }
+
+  def "Post should create a new name, Delete should delete it"(){
+    when:
+    def postName = api.postName(newName)
+    api.deleteName( postName.getNameId() )
+    api.getName(postName.getNameId())
+    then:
+    def exception = thrown(NotFoundException)
+    postName.getFirstName() == newName.getFirstName()
+    postName.getLastName() == newName.getLastName()
+    postName.getNameId() > 0
+    exception.message == NamesValidator.ERROR_INVALID_NAME_ID + postName.getNameId()
   }
 }

@@ -29,7 +29,7 @@ public class NamesValidator {
     if (name == null) {
       errors.add(ERROR_NULL_OBJECT);
     } else {
-      if (name.getNameId() <= 0) {
+      if (name.getNameId() < 0) {
         errors.add(ERROR_INVALID_NAME_ID + name.getNameId());
       }
       if (!nameIsValid(name.getFirstName())) {

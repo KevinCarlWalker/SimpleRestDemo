@@ -1,5 +1,6 @@
 package com.kevinCarlWalker.web;
 
+import com.kevinCarlWalker.web.DataAccess.DatabaseHelpers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -16,6 +17,7 @@ public class Application {
 
   public static void main(String[] args) {
     LOGGER.info("Starting up Names Service");
+    DatabaseHelpers.initializeDatabase();
     SpringApplication app = new SpringApplication(Application.class);
     app.setAdditionalProfiles("live");
     app.run(args);

@@ -4,6 +4,7 @@ import com.kevinCarlWalker.web.exceptions.ExceptionMapper;
 import com.kevinCarlWalker.web.Model.Names;
 import com.kevinCarlWalker.web.exceptions.BadRequestException;
 import com.kevinCarlWalker.web.exceptions.NotFoundException;
+import com.kevinCarlWalker.web.DataAccess.DatabaseHelpers;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -16,9 +17,6 @@ import static com.kevinCarlWalker.web.Model.NamesValidator.*;
 @RequestMapping(value = "/name")
 public class NamesApi {
 
-  public NamesApi() {
-  }
-
   /**
    * Get
    */
@@ -28,29 +26,36 @@ public class NamesApi {
       @ApiResponse(code = 404, message = "Name not found")
   })
   @GetMapping(path = "/{nameId}")
-  public Names getName(@PathVariable Long nameId) {
+  public Names getName(@PathVariable Integer nameId) {
     if (nameId <= 0) {
       throw new NotFoundException(ERROR_INVALID_NAME_ID + nameId, ExceptionMapper.INVALID_NAME);
     }
-    return null;
-//        mongoService.getRuleset(companyId).orElseThrow(() -> new NotFoundException("Target Assignment Rules not found for company: " + companyId, ExceptionMapper.NO_RULESET_FOUND_FOR_COMPANY));
+    Names name = DatabaseHelpers.getName( nameId);
+    if(name.getNameId() < 1){
+      throw new NotFoundException(ERROR_INVALID_NAME_ID + nameId, ExceptionMapper.INVALID_NAME);
+    }
+    return name;
   }
 
   /**
    * Post
+   * Permissive as possible. Posting the same thing twice is allowed. Posting with an existing id updates
    */
   @ApiOperation(value = "Create a Name")
-  @ApiResponses({
-      @ApiResponse(code = 400, message = "Name Already Exists"),
-  })
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-  public void postName(@RequestBody Names name) {
+  public Names postName(@RequestBody Names name) {
     validate(name);
+
     // if name has id,
-    // get name from database
-    // if that id doesn't exist in database, create it
-    // if that id does exist, treat as put
-//    mongoService.insertRuleset(rules);
+    if( name.getNameId() != null && name.getNameId() > 0){
+      Names nameFromDb = DatabaseHelpers.getName( name.getNameId() );
+      //and it already exists in database
+      if(nameFromDb.getNameId().equals(name.getNameId())){
+        //treat it like a put
+        return putName( name.getNameId(), name);
+      }
+    }
+    return DatabaseHelpers.createName( name );
   }
 
   /**
@@ -62,12 +67,12 @@ public class NamesApi {
       @ApiResponse(code = 404, message = "Name not found")
   })
   @PutMapping(path = "/{nameId}",  consumes = MediaType.APPLICATION_JSON_VALUE)
-  public void putName(@PathVariable Long nameId, @RequestBody Names name) {
+  public Names putName(@PathVariable Integer nameId, @RequestBody Names name) {
     validate(name);
-    if ( nameId < 1 || nameId.longValue() != name.getNameId().longValue() ) {
+    if ( nameId < 1 || nameId.intValue() != name.getNameId().intValue() ) {
       throw new BadRequestException(ERROR_MISS_MATCHED_NAME_ID, ExceptionMapper.INVALID_NAME);
     }
-//    mongoService.updateRuleset(rules);
+    return DatabaseHelpers.updateName(name);
   }
 
   /**
@@ -79,6 +84,7 @@ public class NamesApi {
       @ApiResponse(code = 404, message = "Name not found")
   })
   @DeleteMapping(path = "/{nameId}")
-  public void deleteName(@PathVariable Long nameId) {
+  public void deleteName(@PathVariable Integer nameId) {
+    DatabaseHelpers.deleteName(nameId);
   }
 }
